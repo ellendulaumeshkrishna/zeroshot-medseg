@@ -1,0 +1,12 @@
+# Chest CT lungs (Konya et al.): test split, 1800 slices. Both lungs are the target, so two
+# masks are kept. Images and masks are JPEG files.
+inherit: _medclipsamv2_protocol.yaml
+dataset:
+  name: lung_ct
+  root: data/medclipsamv2/lung_CT
+  target_name: lung
+  mask_pattern: "{stem}.jpg"
+  background_prompts: ["background", "body tissue"]
+  target_prompts: ["lung", "lung parenchyma"]
+selection:
+  num_objects: 2

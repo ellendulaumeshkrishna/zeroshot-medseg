@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Text-prompted medical image segmentation</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <div>
+      <p class="eyebrow">B.Tech Project &middot; IIT (BHU) Varanasi</p>
+      <h1>Segment a medical image from a text description</h1>
+      <p class="lede">Zero-shot and training-free: BMC-CLIP with CorrCLIP finds <em>where</em> the described
+        structure is, and MedSAM2 draws <em>its outline</em>. No model was trained or fine-tuned.</p>
+    </div>
+    <div class="status" id="status"><span class="dot"></span><span id="status-text">Connecting&hellip;</span></div>
+  </div>
+</header>
+
+<main class="wrap layout">
+
+  <!-- ===================================================== inputs -->
+  <section class="panel inputs" aria-label="Inputs">
+    <form id="form">
+      <div class="field">
+        <div class="field-head"><span class="step">1</span><h2>Image</h2></div>
+        <label class="drop" id="drop">
+          <input type="file" id="image" accept="image/*" hidden>
+          <img id="preview" alt="" hidden>
+          <span class="drop-text" id="drop-text">Drop an image here or <u>choose a file</u><br>
+            <small>PNG, JPEG, BMP or TIFF</small></span>
+        </label>
+        <p class="hint">Or try a test image (the one with the median Dice of its test set):</p>
+        <div class="examples" id="examples"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-head"><span class="step">2</span><h2>What to segment</h2></div>
+        <label class="label" for="preset">Task</label>
+        <select id="preset"></select>
+        <label class="label" for="target">Target <small>(phrases, comma-separated)</small></label>
+        <input type="text" id="target" autocomplete="off" required>
+        <label class="label" for="background">Background <small>(the normal tissue around it)</small></label>
+        <input type="text" id="background" autocomplete="off">
+        <span class="label">Target shape</span>
+        <div class="segmented" role="radiogroup">
+          <label><input type="radio" name="objects" value="1" checked><span>One object</span></label>
+          <label><input type="radio" name="objects" value="2"><span>Two separate parts</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-head"><span class="step">3</span><h2>Ground truth <small>optional</small></h2></div>
+        <label class="file-line">
+          <input type="file" id="mask" accept="image/*">
+        </label>
+        <p class="hint" id="mask-note">Add the expert mask to see the Dice score.</p>
+      </div>
+
+      <button type="submit" id="run" class="primary" disabled>Segment</button>
+      <p class="hint center">Runs on this computer. Nothing is uploaded anywhere.</p>
+    </form>
+  </section>
+
+  <!-- ===================================================== results -->
+  <section class="panel results" aria-label="Results" aria-live="polite">
+    <div id="empty" class="empty">
+      <h2>What you will see</h2>
+      <ol class="steps-list">
+        <li><b>Target map.</b> For every pixel, how likely it is to be the described target, from BMC-CLIP and CorrCLIP.</li>
+        <li><b>Five point prompts.</b> The five highest, well-separated peaks of that map.</li>
+        <li><b>Fifteen candidates.</b> MedSAM2 draws three outlines per point, each with its own predicted IoU.</li>
+        <li><b>Result.</b> The outline MedSAM2 is most confident about.</li>
+      </ol>
+    </div>
+
+    <div id="busy" class="busy" hidden>
+      <div class="bar"><span></span></div>
+      <p>Running the pipeline&hellip; usually a few seconds on a GPU.</p>
+    </div>
+
+    <div id="error" class="error" hidden></div>
+
+    <div id="output" hidden>
+      <dl class="metrics" id="metrics"></dl>
+
+      <div class="figures">
+        <figure>
+          <figcaption><span class="step">A</span>Input</figcaption>
+          <img id="img-input" alt="Input image" class="zoomable">
+        </figure>
+        <figure>
+          <figcaption><span class="step">B</span>Target map and the 5 point prompts</figcaption>
+          <img id="img-saliency" alt="Target probability map with point prompts" class="zoomable">
+          <div class="legend"><span>low</span><span class="ramp"></span><span>high target probability</span></div>
+          <div class="legend"><span class="legend-dot"></span><span>point whose mask was kept</span></div>
+        </figure>
+        <figure>
+          <figcaption><span class="step">D</span>Result
+            <label class="toggle" id="gt-toggle" hidden><input type="checkbox" id="show-gt" checked> ground-truth outline</label>
+          </figcaption>
+          <img id="img-final" alt="Predicted mask over the image" class="zoomable">
+          <div class="legend"><span class="sw sw-pred"></span><span>prediction</span>
+            <span class="sw sw-gt" id="legend-gt" hidden></span><span id="legend-gt-text" hidden>ground truth</span></div>
+          <div class="downloads">
+            <a id="dl-mask" download="mask.png" class="button">Download mask</a>
+            <a id="dl-overlay" download="overlay.jpg" class="button ghost">Download overlay</a>
+          </div>
+        </figure>
+      </div>
+
+      <section class="candidates-block">
+        <h3><span class="step">C</span>The 15 MedSAM2 candidates <small id="kept-note"></small></h3>
+        <div class="candidates" id="candidates"></div>
+      </section>
+
+      <p class="hint" id="resize-note" hidden></p>
+    </div>
+  </section>
+</main>
+
+<!-- ===================================================== method -->
+<section class="wrap about">
+  <h2>How it works</h2>
+  <div class="about-grid">
+    <figure class="method-figure">
+      <img src="/static/method.png" alt="Pipeline diagram" class="zoomable">
+    </figure>
+    <div class="about-text">
+      <p>The method has two parts. The first part finds <em>where</em> the target is; the second
+        draws <em>its exact outline</em>.</p>
+      <ol>
+        <li>The class phrases (for example &ldquo;benign tumor&rdquo;, &ldquo;malignant tumor&rdquo;) are
+          embedded by BMC-CLIP&rsquo;s text encoder, averaged over 12 medical sentence templates.</li>
+        <li>MedSAM2 splits the image into regions; DINO tells which patches look alike. CorrCLIP lets each
+          patch average only the similar patches of its own region, which gives clean BMC-CLIP patch features.</li>
+        <li>Comparing every patch with the class embeddings gives the target map.</li>
+        <li>The map is blurry, so only its five highest, well-separated peaks are used, as point prompts.</li>
+        <li>MedSAM2 returns three masks per point; the one with the highest predicted IoU is the output.</li>
+      </ol>
+      <h3>Dice on the test sets</h3>
+      <table class="results-table">
+        <thead><tr><th>Dataset</th><th>Target</th><th class="num">Dice</th></tr></thead>
+        <tbody>
+          <tr><td>UDIAT</td><td>breast tumour</td><td class="num">82.19</td></tr>
+          <tr><td>COVID-QU-Ex</td><td>lungs (X-ray)</td><td class="num">94.59</td></tr>
+          <tr><td>ISIC 2018</td><td>skin lesion</td><td class="num">90.40</td></tr>
+          <tr><td>Kvasir-SEG</td><td>polyp</td><td class="num">88.39</td></tr>
+          <tr><td>REFUGE2</td><td>optic disc</td><td class="num">81.57</td></tr>
+          <tr><td>BUSI</td><td>breast lesion</td><td class="num">76.96</td></tr>
+        </tbody>
+      </table>
+      <p class="hint">Mean per-image Dice on each full test set, same settings everywhere; only the text changes.
+        On UDIAT and chest X-ray this is the best published zero-shot result (MedCLIP-SAMv2: 77.76 and 75.79).</p>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap footer">
+  <p>Umesh Krishna and Ganesh Bugatha &middot; supervised by Dr. Indra Deep Mastan &middot; IIT (BHU) Varanasi</p>
+  <p class="refs">Built on BMC-CLIP (BIOMEDICA, CVPR 2025), CorrCLIP (ICCV 2025), MedSAM2 (2025) and DINO (ICCV 2021).
+    Research demo, not a medical device.</p>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden><img alt=""></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

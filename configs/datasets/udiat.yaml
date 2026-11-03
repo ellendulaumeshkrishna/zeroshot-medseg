@@ -1,0 +1,9 @@
+# Breast ultrasound tumours, UDIAT (Yap et al., 2018): test split, 113 images.
+# Same prompts as BUSI; nothing was tuned for this dataset.
+inherit: _medclipsamv2_protocol.yaml
+dataset:
+  name: udiat
+  root: data/medclipsamv2/breast_tumors
+  target_name: tumor
+  background_prompts: ["normal breast tissue", "background"]
+  target_prompts: ["benign tumor", "malignant tumor"]

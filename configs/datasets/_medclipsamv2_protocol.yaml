@@ -1,0 +1,16 @@
+# Shared evaluation protocol of MedCLIP-SAMv2 (Koleilat et al., Medical Image Analysis 2025),
+# used by udiat.yaml, lung_xray.yaml, brain_mri.yaml and lung_ct.yaml so that the numbers are
+# directly comparable with the published zero-shot results:
+#   * test split of the authors' data bundle;
+#   * masks binarised at value > 200;
+#   * the prediction is resized to the mask size (nearest neighbour) before scoring;
+#   * per-image Dice and NSD (tolerance 2 px), averaged over images.
+# Get the bundle:  python -m zsmedseg download-data medclipsamv2   then   python -m zsmedseg prepare-data medclipsamv2
+dataset:
+  images_dir: test_images
+  masks_dir: test_masks
+  mask_pattern: "{stem}.png"
+  mask_threshold: 200
+evaluation:
+  nsd_tolerance: 2
+  resize_prediction_to_mask: true

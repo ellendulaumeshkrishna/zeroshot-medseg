@@ -1,0 +1,11 @@
+# ISIC 2018 Task 1 skin-lesion segmentation: official test split (1000 dermoscopy images),
+# longest side capped at 1024 px by prepare-data.
+# Get it:  python -m zsmedseg download-data isic2018   then   python -m zsmedseg prepare-data isic2018
+dataset:
+  name: isic2018
+  root: data/isic2018
+  mask_pattern: "{stem}_mask.png"
+  mask_threshold: 0
+  target_name: lesion
+  background_prompts: ["healthy skin", "background"]
+  target_prompts: ["skin lesion", "pigmented lesion"]

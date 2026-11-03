@@ -1,0 +1,34 @@
+# Model weights and data are never versioned.
+weights/
+data/
+raw/
+*.pt
+*.pth
+*.ckpt
+
+# Run outputs
+outputs/
+
+# The MedSAM2 clone used for the `sam2` package
+MedSAM2/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local helper packages for development runs
+.devlibs/

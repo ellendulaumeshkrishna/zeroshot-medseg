@@ -1,0 +1,11 @@
+# Chest X-ray lungs, COVID-QU-Ex: test split, 957 images.
+# The target is both lungs, i.e. two separate objects, so two masks are kept.
+inherit: _medclipsamv2_protocol.yaml
+dataset:
+  name: lung_xray
+  root: data/medclipsamv2/lung_Xray
+  target_name: lung
+  background_prompts: ["background", "bone", "soft tissue"]
+  target_prompts: ["lung", "lung field"]
+selection:
+  num_objects: 2

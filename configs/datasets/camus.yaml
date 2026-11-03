@@ -1,0 +1,11 @@
+# CAMUS echocardiography: test patients 451-500, 2- and 4-chamber views at end-diastole and
+# end-systole (200 images). Target = left-ventricle cavity.
+# Get it:  python -m zsmedseg download-data camus   then   python -m zsmedseg prepare-data camus
+dataset:
+  name: camus
+  root: data/camus
+  mask_pattern: "{stem}_mask.png"
+  mask_threshold: 0
+  target_name: left ventricle
+  background_prompts: ["heart muscle", "background"]
+  target_prompts: ["left ventricle", "left ventricular cavity"]

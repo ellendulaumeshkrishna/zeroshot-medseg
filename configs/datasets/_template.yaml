@@ -1,0 +1,27 @@
+# Template for a NEW dataset. Copy this file, rename it and edit the values.
+#
+# Expected folder layout (python -m zsmedseg prepare-data generic --images ... --masks ... --out ... creates it):
+#   <root>/images/<name>.<ext>
+#   <root>/masks/<mask_pattern with {stem} = <name>>     (optional: omit for prediction only)
+#
+# Run:  python -m zsmedseg evaluate --config configs/datasets/my_dataset.yaml
+dataset:
+  name: my_dataset                 # used for the output folder name
+  root: data/my_dataset
+  images_dir: images
+  masks_dir: masks                 # set to null if you have no ground truth
+  image_extensions: [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"]
+  mask_pattern: "{stem}_mask.png"  # e.g. "{stem}.png" if masks share the image name
+  mask_threshold: 0                # foreground = pixel > threshold (use 127 for JPEG masks)
+  target_name: lesion              # name used in reports
+
+  # Describe the classes in words. This is the ONLY task-specific input.
+  # - Use 1-3 short synonyms per class; they are averaged.
+  # - Describe what the target looks like in medical terms ("skin lesion", "nodule").
+  # - The background should cover the normal tissue seen around the target.
+  background_prompts: ["normal tissue", "background"]
+  target_prompts: ["lesion", "tumor"]
+
+# Any other setting can be overridden here too, e.g.
+# prompting:
+#   num_points: 5

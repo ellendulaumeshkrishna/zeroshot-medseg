@@ -1,0 +1,9 @@
+# Brain MRI tumours (T1-weighted, Cheng et al.): test split, 600 slices.
+# Prompts name the three tumour types present in the dataset.
+inherit: _medclipsamv2_protocol.yaml
+dataset:
+  name: brain_mri
+  root: data/medclipsamv2/brain_tumors
+  target_name: tumor
+  background_prompts: ["normal brain tissue", "background"]
+  target_prompts: ["brain tumor", "glioma", "meningioma", "pituitary tumor"]

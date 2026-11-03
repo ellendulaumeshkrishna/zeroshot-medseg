@@ -1,0 +1,11 @@
+# REFUGE2 optic-disc segmentation (retinal fundus photographs): test split (400 images).
+# Target = whole optic disc (rim + cup).
+# Get it:  python -m zsmedseg download-data refuge2   then   python -m zsmedseg prepare-data refuge2
+dataset:
+  name: refuge2
+  root: data/refuge2
+  mask_pattern: "{stem}_mask.png"
+  mask_threshold: 0
+  target_name: optic disc
+  background_prompts: ["retina", "background"]
+  target_prompts: ["optic disc", "optic nerve head"]

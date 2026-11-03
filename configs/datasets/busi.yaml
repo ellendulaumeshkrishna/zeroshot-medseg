@@ -1,0 +1,10 @@
+# BUSI breast ultrasound (Al-Dhabyani et al., 2020): 780 images (133 normal, i.e. no lesion).
+# Get it:  python -m zsmedseg download-data busi   then   python -m zsmedseg prepare-data busi
+dataset:
+  name: busi
+  root: data/busi
+  mask_pattern: "{stem}_mask.png"
+  mask_threshold: 0          # masks are stored as {0, 1}
+  target_name: lesion
+  background_prompts: ["normal breast tissue", "background"]
+  target_prompts: ["benign tumor", "malignant tumor"]

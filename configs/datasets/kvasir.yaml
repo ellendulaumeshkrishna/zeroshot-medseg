@@ -1,0 +1,10 @@
+# Kvasir-SEG colonoscopy polyps (Jha et al., 2020): 1000 images, all containing a polyp.
+# Get it:  python -m zsmedseg download-data kvasir   then   python -m zsmedseg prepare-data kvasir
+dataset:
+  name: kvasir
+  root: data/kvasir
+  mask_pattern: "{stem}_mask.png"
+  mask_threshold: 0          # masks are stored as {0, 1}
+  target_name: polyp
+  background_prompts: ["normal colon mucosa", "healthy bowel lining", "background"]
+  target_prompts: ["polyp", "colorectal polyp"]

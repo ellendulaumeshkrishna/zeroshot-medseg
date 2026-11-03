@@ -1,0 +1,17 @@
+# Exact versions behind the reported numbers (Python 3.10 or 3.11, CUDA 12.1 build of PyTorch).
+# Install PyTorch first:
+#   pip install torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu121
+#   pip install -r requirements-exact.txt
+# Newer PyTorch / NumPy versions run fine but change the results slightly (floating-point
+# differences): on the first 20 Kvasir images, Dice 83.93 instead of 83.11.
+open_clip_torch==2.24.0
+numpy==1.23.5
+scipy==1.15.3
+scikit-learn==1.7.0
+opencv-python-headless==5.0.0.93
+hydra-core==1.3.2
+omegaconf>=2.3
+iopath>=0.1.10
+PyYAML>=6.0
+tqdm>=4.64
+huggingface_hub>=0.20
