@@ -11,8 +11,9 @@
 # Run outputs
 /outputs/
 
-# The MedSAM2 clone used for the `sam2` package
+# The MedSAM2 clone used for the `sam2` package, and the SAM2 clone it needs one file from
 /MedSAM2/
+/sam2-upstream/
 
 # Build artefacts (root only)
 /build/

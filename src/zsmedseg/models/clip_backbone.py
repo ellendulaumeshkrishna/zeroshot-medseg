@@ -42,7 +42,9 @@ def load_bmc_clip(
         )
 
     model = open_clip.create_model(arch, pretrained=None, precision="fp32")
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    # weights_only=False: PyTorch 2.6 flipped this default to True, and the BMC-CLIP
+    # checkpoint stores numpy scalars, which the restricted unpickler rejects.
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
     missing, unexpected = model.load_state_dict(_extract_state_dict(checkpoint), strict=False)
     del checkpoint
     if missing or unexpected:

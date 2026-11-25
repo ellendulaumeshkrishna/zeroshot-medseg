@@ -36,6 +36,8 @@ pip install -r requirements-exact.txt
 pip install --no-deps -e .
 pip install fastapi uvicorn python-multipart kaggle gdown pytest "surface-distance @ git+https://github.com/google-deepmind/surface-distance.git"
 git clone https://github.com/bowang-lab/MedSAM2.git
+git clone https://github.com/facebookresearch/sam2.git sam2-upstream
+cp sam2-upstream/sam2/automatic_mask_generator.py MedSAM2/sam2/
 ```
 
 Why each line:
@@ -76,6 +78,8 @@ into a code cell:
 !pip install -q --no-deps -e .
 !pip install -q fastapi uvicorn python-multipart kaggle gdown "surface-distance @ git+https://github.com/google-deepmind/surface-distance.git"
 !git clone -q https://github.com/bowang-lab/MedSAM2.git
+!git clone -q https://github.com/facebookresearch/sam2.git sam2-upstream
+!cp sam2-upstream/sam2/automatic_mask_generator.py MedSAM2/sam2/
 !python -m zsmedseg --help
 ```
 
@@ -303,6 +307,7 @@ notebook cells there instead.
 | Symptom | Fix |
 |---|---|
 | `ImportError: The sam2 package from MedSAM2 is required` | Run `git clone https://github.com/bowang-lab/MedSAM2.git` inside the repository folder, or set `ZSMEDSEG_MEDSAM2_DIR` to your clone. |
+| `ModuleNotFoundError: No module named 'sam2.automatic_mask_generator'` | MedSAM2 does not ship that module. Copy it from SAM2: `git clone https://github.com/facebookresearch/sam2.git sam2-upstream` then `cp sam2-upstream/sam2/automatic_mask_generator.py MedSAM2/sam2/`. |
 | `No module named 'efficient_track_anything'` | You installed Meta's SAM 2 instead of MedSAM2. Use the MedSAM2 repository, which contains both packages. |
 | `BMC-CLIP checkpoint not found` | Run `download-weights`, or pass `--set weights.bmc_clip=<path>`. |
 | `Raw data not found at raw/<name>` | Run `download-data <name>` first, or give `prepare-data` a `--source`. |

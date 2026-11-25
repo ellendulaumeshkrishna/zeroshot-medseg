@@ -59,6 +59,8 @@ git clone <this repository> zeroshot-medseg && cd zeroshot-medseg
 pip install torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements-exact.txt && pip install --no-deps -e .   # exact versions (Python 3.10/3.11)
 git clone https://github.com/bowang-lab/MedSAM2.git          # provides the sam2 package
+git clone https://github.com/facebookresearch/sam2.git sam2-upstream            # MedSAM2 omits one module:
+cp sam2-upstream/sam2/automatic_mask_generator.py MedSAM2/sam2/   # SAM2AutomaticMaskGenerator
 python -m zsmedseg download-weights                          # BMC-CLIP + MedSAM2, about 5.3 GB
 python -m zsmedseg download-data kvasir                      # raw files -> raw/kvasir
 python -m zsmedseg prepare-data kvasir                       # -> data/kvasir/images + masks
