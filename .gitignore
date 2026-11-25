@@ -1,23 +1,33 @@
 # Model weights and data are never versioned.
-weights/
-data/
-raw/
+# Leading "/" anchors these to the repository root, so a source folder with the
+# same name (e.g. src/zsmedseg/data/) is NOT ignored.
+/weights/
+/data/
+/raw/
 *.pt
 *.pth
 *.ckpt
 
 # Run outputs
-outputs/
+/outputs/
 
 # The MedSAM2 clone used for the `sam2` package
-MedSAM2/
+/MedSAM2/
 
-# Python
+# Build artefacts (root only)
+/build/
+/dist/
+
+# Local helper packages for development runs
+/.devlibs/
+
+# Local launcher with machine-specific paths
+/start_demo.bat
+
+# Python caches (these genuinely appear at any depth)
 __pycache__/
 *.py[cod]
 *.egg-info/
-build/
-dist/
 .pytest_cache/
 .ruff_cache/
 .ipynb_checkpoints/
@@ -29,6 +39,3 @@ venv/
 Thumbs.db
 .idea/
 .vscode/
-
-# Local helper packages for development runs
-.devlibs/
